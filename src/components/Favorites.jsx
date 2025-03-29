@@ -1,53 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import RecipeCard from "./RecipeCard";
 
-const RecipeCard = ({ recipe }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+const Favorites = () => {
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setIsFavorite(savedFavorites.some((fav) => fav.idMeal === recipe.idMeal));
-  }, [recipe.idMeal]);
-
-  const toggleFavorite = () => {
-    let savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    if (isFavorite) {
-      savedFavorites = savedFavorites.filter((fav) => fav.idMeal !== recipe.idMeal);
-    } else {
-      savedFavorites.push(recipe);
-    }
-    localStorage.setItem("favorites", JSON.stringify(savedFavorites));
-    setIsFavorite(!isFavorite);
-  };
+    const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    setFavorites(storedFavorites);
+  }, []);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 transition-transform transform hover:scale-105 hover:shadow-lg">
-      <Link to={`/recipe/${recipe.idMeal}`} className="block">
-        <img
-          src={recipe.strMealThumb}
-          alt={recipe.strMeal}
-          className="w-full h-48 object-cover rounded-md"
-        />
-        <h2 className="text-xl font-semibold mt-2">{recipe.strMeal}</h2>
-        <p className="text-gray-600">{recipe.strCategory} | {recipe.strArea}</p>
-      </Link>
-      <div className="flex justify-between items-center mt-3">
-        <Link 
-          to={`/recipe/${recipe.idMeal}`} 
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-        >
-          View Details
-        </Link>
-        <button 
-          onClick={toggleFavorite} 
-          className={`px-3 py-2 rounded-md ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-300 text-black'}`}
-        >
-          {isFavorite ? "❤️ Remove" : "♡ Favorite"}
-        </button>
-      </div>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold text-center">Favorite Recipes</h1>
+      
+      {favorites.length === 0 ? (
+        <p className="text-center text-gray-600 mt-4">No favorite recipes yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+          {favorites.map((recipe) =>
+            recipe ? <RecipeCard key={recipe.idMeal} recipe={recipe} /> : null
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
-export default RecipeCard;
-
+export default Favorites;
