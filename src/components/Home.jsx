@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import RecipeCard from "./RecipeCard";
 import SearchBar from "./SearchBar";
 import axios from "axios";
+import Skeleton from "react-loading-skeleton"; // Install using: npm install react-loading-skeleton
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
@@ -13,12 +15,22 @@ const Home = () => {
     const fetchRecipes = async () => {
       setLoading(true);
       setError(null);
+
+      // Check localStorage cache before making an API request
+      const cachedData = localStorage.getItem(`recipes-${searchQuery}`);
+      if (cachedData) {
+        setRecipes(JSON.parse(cachedData));
+        setLoading(false);
+        return;
+      }
+
       try {
-        const query = searchQuery || "chicken"; // Default to "chicken" if empty
+        const query = searchQuery || "chicken"; // Default search query
         const response = await axios.get(
           `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`
         );
         setRecipes(response.data.meals || []);
+        localStorage.setItem(`recipes-${searchQuery}`, JSON.stringify(response.data.meals || [])); // Cache response
       } catch (error) {
         console.error("Error fetching recipes:", error);
         setError("Failed to load recipes. Please try again.");
@@ -51,7 +63,14 @@ const Home = () => {
       
       <SearchBar onSearch={setSearchQuery} />
       
-      {loading && <p className="text-center text-gray-600">Loading recipes...</p>}
+      {loading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+          {[...Array(6)].map((_, index) => (
+            <Skeleton key={index} height={200} />
+          ))}
+        </div>
+      )}
+
       {error && (
         <div className="text-center text-red-500">
           <p>{error}</p>
@@ -63,7 +82,7 @@ const Home = () => {
           </button>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
         {recipes.length > 0 ? (
           recipes.map((meal) => (
