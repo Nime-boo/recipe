@@ -3,58 +3,73 @@ import React, { useState, useEffect } from "react";
 const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-
-  // Debounce effect to prevent excessive API calls
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 500); // 500ms delay
-
-    return () => clearTimeout(handler);
-  }, [query]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  let debounceTimer;
 
   useEffect(() => {
-    if (debouncedQuery.trim() !== "") {
-      onSearch(debouncedQuery);
-      updateSuggestions(debouncedQuery);
+    return () => clearTimeout(debounceTimer);
+  }, []);
+
+  const handleChange = (e) => {
+    setQuery(e.target.value);
+    setShowSuggestions(true);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      if (e.target.value.trim() !== "") {
+        onSearch(e.target.value);
+        setShowSuggestions(false); // Hide suggestions after search
+      }
+    }, 500);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (query.trim() !== "") {
+      onSearch(query);
+      setShowSuggestions(false); // Hide suggestions after search
+      setSuggestions((prev) => 
+        [query, ...prev.filter((item) => item !== query)].slice(0, 5)
+      );
     }
-  }, [debouncedQuery, onSearch]);
+  };
 
-  const updateSuggestions = (newQuery) => {
-    setSuggestions((prev) => {
-      const updated = [newQuery, ...prev.filter((q) => q !== newQuery)];
-      return updated.slice(0, 5); // Store only the last 5 searches
-    });
+  const handleSuggestionClick = (suggestion) => {
+    setQuery(suggestion);
+    onSearch(suggestion);
+    setShowSuggestions(false);
   };
 
   return (
-    <div className="mb-4">
-      <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-2">
+    <div className="mb-4 relative">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2">
         <input
           type="text"
           placeholder="Search for a recipe..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleChange}
+          onFocus={() => setShowSuggestions(true)}
           className="p-2 border rounded-md w-full"
         />
-        {suggestions.length > 0 && (
-          <ul className="border rounded-md bg-white shadow-md p-2">
-            {suggestions.map((s, index) => (
-              <li
-                key={index}
-                className="p-1 cursor-pointer hover:bg-gray-200"
-                onClick={() => {
-                  setQuery(s);
-                  onSearch(s);
-                }}
-              >
-                {s}
-              </li>
-            ))}
-          </ul>
-        )}
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        >
+          Search
+        </button>
       </form>
+      {showSuggestions && suggestions.length > 0 && (
+        <ul className="absolute left-0 w-full bg-white border rounded-md mt-1 shadow-md">
+          {suggestions.map((suggestion, index) => (
+            <li
+              key={index}
+              onClick={() => handleSuggestionClick(suggestion)}
+              className="p-2 cursor-pointer hover:bg-gray-200"
+            >
+              {suggestion}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
