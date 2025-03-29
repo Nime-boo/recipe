@@ -4,39 +4,34 @@ const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  let debounceTimer;
 
   useEffect(() => {
-    return () => clearTimeout(debounceTimer);
-  }, []);
-
-  const handleChange = (e) => {
-    setQuery(e.target.value);
-    setShowSuggestions(true);
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      if (e.target.value.trim() !== "") {
-        onSearch(e.target.value);
-        setShowSuggestions(false); // Hide suggestions after search
-      }
-    }, 500);
-  };
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    
+    const timer = setTimeout(() => {
+      fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.meals) {
+            setSuggestions(data.meals.map((meal) => meal.strMeal));
+          } else {
+            setSuggestions([]);
+          }
+        });
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim() !== "") {
       onSearch(query);
       setShowSuggestions(false); // Hide suggestions after search
-      setSuggestions((prev) => 
-        [query, ...prev.filter((item) => item !== query)].slice(0, 5)
-      );
     }
-  };
-
-  const handleSuggestionClick = (suggestion) => {
-    setQuery(suggestion);
-    onSearch(suggestion);
-    setShowSuggestions(false);
   };
 
   return (
@@ -46,8 +41,10 @@ const SearchBar = ({ onSearch }) => {
           type="text"
           placeholder="Search for a recipe..."
           value={query}
-          onChange={handleChange}
-          onFocus={() => setShowSuggestions(true)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setShowSuggestions(true);
+          }}
           className="p-2 border rounded-md w-full"
         />
         <button
@@ -58,12 +55,15 @@ const SearchBar = ({ onSearch }) => {
         </button>
       </form>
       {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute left-0 w-full bg-white border rounded-md mt-1 shadow-md">
+        <ul className="absolute bg-white border rounded-md w-full mt-1 z-50 max-h-40 overflow-auto">
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="p-2 cursor-pointer hover:bg-gray-200"
+              className="p-2 hover:bg-gray-200 cursor-pointer"
+              onClick={() => {
+                setQuery(suggestion);
+                setShowSuggestions(false); // Hide after selection
+              }}
             >
               {suggestion}
             </li>
