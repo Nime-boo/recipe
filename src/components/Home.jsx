@@ -10,6 +10,8 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [shoppingList, setShoppingList] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   // Function to fetch recipes with caching
   const fetchRecipes = useCallback(async (query) => {
@@ -39,6 +41,19 @@ const Home = () => {
     setLoading(false);
   }, []);
 
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("https://www.themealdb.com/api/json/v1/1/categories.php");
+        setCategories(response.data.categories || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   // Fetch recipes when searchQuery changes
   useEffect(() => {
     const query = searchQuery.trim() || "chicken"; // Default search query
@@ -65,12 +80,29 @@ const Home = () => {
     setLoading(false);
   };
 
+  // Add ingredients to shopping list
+  const addToShoppingList = (ingredients) => {
+    setShoppingList((prevList) => [...prevList, ...ingredients]);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-center">Welcome to the Recipe App</h1>
       <p className="text-center text-gray-600">Discover amazing recipes and try them at home!</p>
       
       <SearchBar onSearch={setSearchQuery} />
+
+      <div className="flex flex-wrap justify-center gap-4 mt-4">
+        {categories.map((category) => (
+          <button
+            key={category.idCategory}
+            onClick={() => setSearchQuery(category.strCategory)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            {category.strCategory}
+          </button>
+        ))}
+      </div>
       
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
@@ -98,12 +130,27 @@ const Home = () => {
       {!loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
           {recipes.length > 0 ? (
-            recipes.map((meal) => <RecipeCard key={meal.idMeal} recipe={meal} />)
+            recipes.map((meal) => (
+              <RecipeCard key={meal.idMeal} recipe={meal} onAddToShoppingList={addToShoppingList} />
+            ))
           ) : (
             <p className="text-center text-gray-600 col-span-3">No recipes found.</p>
           )}
         </div>
       )}
+
+      <div className="mt-6">
+        <h2 className="text-2xl font-bold">Shopping List</h2>
+        {shoppingList.length > 0 ? (
+          <ul className="list-disc pl-5">
+            {shoppingList.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-600">No items in the shopping list.</p>
+        )}
+      </div>
     </div>
   );
 };
