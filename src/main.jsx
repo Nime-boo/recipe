@@ -1,13 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom/client"; // ✅ Fixed missing import
-import { BrowserRouter as Router } from "react-router-dom";
-import "./index.css";
-import App from "./App.jsx";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter
+import App from "./App";
+import "./index.css"; // Ensure global styles are loaded
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <Router> {/* ✅ Ensure only ONE <Router> exists */}
-      <App />
-    </Router>
-  </React.StrictMode>
+  <BrowserRouter> {/* Wrap everything here */}
+    <App />
+  </BrowserRouter>
 );
