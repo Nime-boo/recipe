@@ -3,31 +3,26 @@ import React, { useState, useEffect } from "react";
 const ShoppingList = () => {
   const [items, setItems] = useState([]);
 
+  // Load shopping list from localStorage on mount
   useEffect(() => {
-    // Load shopping list from localStorage
     const savedItems = JSON.parse(localStorage.getItem("shoppingList")) || [];
     setItems(savedItems);
   }, []);
 
+  // Update localStorage whenever items change
   useEffect(() => {
-    // Update localStorage when items change
     localStorage.setItem("shoppingList", JSON.stringify(items));
   }, [items]);
 
   const updateQuantity = (index, quantity) => {
     const newList = [...items];
-    newList[index].quantity = quantity;
+    newList[index].quantity = Math.max(1, parseInt(quantity, 10) || 1);
     setItems(newList);
   };
 
   const removeItem = (index) => {
     const updatedList = items.filter((_, i) => i !== index);
     setItems(updatedList);
-  };
-
-  const clearShoppingList = () => {
-    setItems([]);
-    localStorage.removeItem("shoppingList");
   };
 
   return (
@@ -43,7 +38,7 @@ const ShoppingList = () => {
               <span>{item.name} ({item.measure})</span>
               <input
                 type="number"
-                value={item.quantity || 1}
+                value={item.quantity}
                 min="1"
                 onChange={(e) => updateQuantity(index, e.target.value)}
                 className="border p-1 w-16 text-center"
@@ -52,23 +47,6 @@ const ShoppingList = () => {
             </li>
           ))}
         </ul>
-      )}
-
-      {items.length > 0 && (
-        <div className="mt-4 flex space-x-4">
-          <button
-            onClick={clearShoppingList}
-            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-          >
-            Clear List
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-          >
-            Print List
-          </button>
-        </div>
       )}
     </div>
   );
