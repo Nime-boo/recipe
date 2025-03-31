@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 
 const RecipeCard = ({ recipe }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  const [shoppingList, setShoppingList] = useState([]);
 
   useEffect(() => {
     const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -27,12 +26,22 @@ const RecipeCard = ({ recipe }) => {
       if (recipe[`strIngredient${i}`]) {
         ingredients.push({
           name: recipe[`strIngredient${i}`],
-          measure: recipe[`strMeasure${i}`],
+          measure: recipe[`strMeasure${i}`] || "",
         });
       }
     }
-    localStorage.setItem("shoppingList", JSON.stringify(ingredients));
-    setShoppingList(ingredients);
+
+    let savedShoppingList = JSON.parse(localStorage.getItem("shoppingList")) || [];
+    
+    // Prevent duplicates before adding
+    const updatedList = [...savedShoppingList, ...ingredients].reduce((acc, item) => {
+      if (!acc.find((ing) => ing.name === item.name)) {
+        acc.push(item);
+      }
+      return acc;
+    }, []);
+
+    localStorage.setItem("shoppingList", JSON.stringify(updatedList));
     alert("Ingredients added to shopping list!");
   };
 
