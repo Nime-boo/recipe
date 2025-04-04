@@ -9,7 +9,7 @@ const RecipeDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 🚧 Check for profile setup
+  // ✅ Redirect to profile setup if not set
   useEffect(() => {
     const userProfile = localStorage.getItem("userProfile");
     if (!userProfile) {
@@ -39,6 +39,24 @@ const RecipeDetails = () => {
     fetchRecipeDetails();
   }, [id]);
 
+  const getIngredients = (recipe) => {
+    let ingredients = [];
+    for (let i = 1; i <= 20; i++) {
+      const ingredient = recipe[`strIngredient${i}`];
+      const measure = recipe[`strMeasure${i}`];
+      if (ingredient && ingredient.trim()) {
+        ingredients.push(`${measure} ${ingredient}`);
+      }
+    }
+    return ingredients;
+  };
+
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -59,6 +77,9 @@ const RecipeDetails = () => {
       </div>
     );
 
+  const ingredients = getIngredients(recipe);
+  const videoEmbedUrl = getYouTubeEmbedUrl(recipe.strYoutube);
+
   return (
     <div className="container mx-auto p-6">
       <Link to="/" className="text-blue-500 hover:underline">
@@ -76,12 +97,36 @@ const RecipeDetails = () => {
           alt={recipe.strMeal}
           className="w-full md:w-1/2 rounded-lg shadow-md"
         />
-
         <div className="w-full md:w-1/2">
-          <h2 className="text-xl font-semibold mb-2">Instructions</h2>
-          <p className="text-gray-700">{recipe.strInstructions}</p>
+          <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
+          <ul className="list-disc pl-5 space-y-1 text-gray-700">
+            {ingredients.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
         </div>
       </div>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-2">Instructions</h2>
+        <p className="whitespace-pre-line text-gray-700">{recipe.strInstructions}</p>
+      </div>
+
+      {videoEmbedUrl && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-2">Watch Video</h2>
+          <div className="aspect-w-16 aspect-h-9">
+            <iframe
+              src={videoEmbedUrl}
+              title="YouTube video player"
+              className="w-full h-72 md:h-96 rounded-lg shadow-lg"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
