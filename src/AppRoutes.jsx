@@ -3,28 +3,48 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import RecipeDetails from "./components/RecipeDetails";
 import Favorites from "./components/Favorites";
+import SignupPage from "./components/SignupPage";
+import LoginPage from "./components/LoginPage";
 import ProfileSetup from "./components/ProfileSetup";
-import ShoppingList from "./components/ShoppingList";
-
+import ProfilePage from "./components/ProfilePage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const AppRoutes = () => {
-
-  const userProfile = JSON.parse(localStorage.getItem("userProfile"));
-
   return (
     <Routes>
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/profile" element={<ProfileSetup />} />
+      <Route path="/my-profile" element={<ProfilePage />} />
 
-      <Route path="/" element={userProfile ? <Home /> : <ProfileSetup />} />
-
-      <Route path="/recipe/:id" element={<RecipeDetails />} />
-
-      <Route path="/favorites" element={<Favorites />} />
-
-      <Route path="/profile-setup" element={<ProfileSetup />} /> {/* Profile setup route */}
-      <Route path="/shopping-list" element={userProfile ? <ShoppingList /> : <ProfileSetup />} /> {/* Shopping List route */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/recipe/:id"
+        element={
+          <ProtectedRoute>
+            <RecipeDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/favorites"
+        element={
+          <ProtectedRoute>
+            <Favorites />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };
 
 export default AppRoutes;
+
 
