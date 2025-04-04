@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const RecipeDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // 🚧 Check for profile setup
+  useEffect(() => {
+    const userProfile = localStorage.getItem("userProfile");
+    if (!userProfile) {
+      navigate("/profile");
+    }
+  }, [navigate]);
 
   const fetchRecipeDetails = async () => {
     setLoading(true);
@@ -69,48 +78,10 @@ const RecipeDetails = () => {
         />
 
         <div className="w-full md:w-1/2">
-          <h2 className="text-xl font-semibold">Ingredients:</h2>
-          <ul className="list-disc pl-5">
-            {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => {
-              const ingredient = recipe[`strIngredient${num}`];
-              const measure = recipe[`strMeasure${num}`];
-              return ingredient ? (
-                <li key={num}>
-                  {measure} {ingredient}
-                </li>
-              ) : null;
-            })}
-          </ul>
+          <h2 className="text-xl font-semibold mb-2">Instructions</h2>
+          <p className="text-gray-700">{recipe.strInstructions}</p>
         </div>
       </div>
-
-      <h2 className="text-xl font-semibold mt-6">Instructions:</h2>
-      <p className="whitespace-pre-line text-gray-700">{recipe.strInstructions}</p>
-
-      {recipe.strYoutube && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold">Watch Video:</h2>
-          <div className="relative overflow-hidden" style={{ paddingTop: "56.25%" }}>
-            <iframe
-              className="absolute top-0 left-0 w-full h-full"
-              src={recipe.strYoutube.replace("watch?v=", "embed/")}
-              title="Recipe Video"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      )}
-
-      {recipe.strSource && (
-        <a
-          href={recipe.strSource}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block mt-4 text-blue-500 hover:underline text-center"
-        >
-          View Full Recipe on TheMealDB
-        </a>
-      )}
     </div>
   );
 };
