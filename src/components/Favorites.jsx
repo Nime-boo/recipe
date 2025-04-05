@@ -1,29 +1,31 @@
 import React, { useEffect, useState } from "react";
 import RecipeCard from "./RecipeCard";
-import { useShoppingList } from "./ShoppingListContext"; // ✅ Import context
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
-  const { addToShoppingList } = useShoppingList(); // ✅ Use context
 
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
     setFavorites(storedFavorites);
   }, []);
 
-  // ✅ Add recipe's ingredients to shopping list
+  // Update to handle adding ingredients directly to localStorage
   const handleAddToShoppingList = (recipe) => {
-    const ingredients = [];
+    const ingredients = [
+      recipe.strIngredient1,
+      recipe.strIngredient2,
+      recipe.strIngredient3,
+      // Add more ingredients if needed
+    ].filter(Boolean);
 
-    for (let i = 1; i <= 20; i++) {
-      const ingredient = recipe[`strIngredient${i}`];
-      const measure = recipe[`strMeasure${i}`];
-      if (ingredient && ingredient.trim()) {
-        ingredients.push(`${ingredient} - ${measure}`.trim());
-      }
-    }
+    // Get current shopping list from localStorage
+    const shoppingList = JSON.parse(localStorage.getItem("shoppingList")) || [];
 
-    ingredients.forEach((item) => addToShoppingList(item));
+    // Add new ingredients to shopping list
+    const updatedShoppingList = [...shoppingList, ...ingredients];
+
+    // Update shopping list in localStorage
+    localStorage.setItem("shoppingList", JSON.stringify(updatedShoppingList));
   };
 
   return (
@@ -38,12 +40,7 @@ const Favorites = () => {
             recipe ? (
               <div key={recipe.idMeal} className="relative">
                 <RecipeCard recipe={recipe} />
-                <button
-                  onClick={() => handleAddToShoppingList(recipe)}
-                  className="mt-2 w-full bg-green-600 text-white py-1 px-2 rounded hover:bg-green-700"
-                >
-                  Add to Shopping List
-                </button>
+                
               </div>
             ) : null
           )}

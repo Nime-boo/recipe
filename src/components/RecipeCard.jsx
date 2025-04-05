@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useShoppingList } from "./ShoppingListContext"; // ✅ Import the shopping list context
 
 const RecipeCard = ({ recipe }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  const { addToShoppingList } = useShoppingList(); // ✅ Use the context to add to shopping list
 
   useEffect(() => {
     const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -22,7 +20,7 @@ const RecipeCard = ({ recipe }) => {
     setIsFavorite(!isFavorite);
   };
 
-  const addToShoppingListHandler = () => {
+  const addToShoppingList = () => {
     const ingredients = [];
     for (let i = 1; i <= 20; i++) {
       if (recipe[`strIngredient${i}`]) {
@@ -33,8 +31,17 @@ const RecipeCard = ({ recipe }) => {
       }
     }
 
-    // Use the context method to add ingredients to the shopping list
-    ingredients.forEach(item => addToShoppingList(item)); // ✅ Add each ingredient to the shopping list context
+    let savedShoppingList = JSON.parse(localStorage.getItem("shoppingList")) || [];
+
+    // Prevent duplicates before adding
+    const updatedList = [...savedShoppingList, ...ingredients].reduce((acc, item) => {
+      if (!acc.find((ing) => ing.name === item.name)) {
+        acc.push(item);
+      }
+      return acc;
+    }, []);
+
+    localStorage.setItem("shoppingList", JSON.stringify(updatedList));
     alert("Ingredients added to shopping list!");
   };
 
@@ -51,10 +58,10 @@ const RecipeCard = ({ recipe }) => {
       </Link>
       <div className="flex justify-between items-center mt-3">
         <button 
-          onClick={addToShoppingListHandler} // ✅ Update function here
+          onClick={addToShoppingList} 
           className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
         >
-          🛒 Add to List
+          🛒 Add to Shopping List
         </button>
         <button 
           onClick={toggleFavorite} 

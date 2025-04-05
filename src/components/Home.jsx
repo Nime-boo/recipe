@@ -4,17 +4,37 @@ import SearchBar from "./SearchBar";
 import axios from "axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useShoppingList } from "./ShoppingListContext"; // ✅
 
-
-const Home = () => {
+const Home = ({ setShoppingListCount }) => {
   const [recipes, setRecipes] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [shoppingList, setShoppingList] = useState(
+    JSON.parse(localStorage.getItem("shoppingList")) || []
+  );
 
-  const { addToShoppingList } = useShoppingList(); // ✅
+  // Function to add ingredients to shopping list
+  const handleAddToShoppingList = (recipe) => {
+    const item = {
+      id: recipe.idMeal,
+      name: recipe.strMeal,
+      ingredients: [
+        recipe.strIngredient1,
+        recipe.strIngredient2,
+        recipe.strIngredient3,
+        // Add more if needed
+      ].filter(Boolean),
+    };
+
+    const updatedShoppingList = [...shoppingList, ...item.ingredients];
+    setShoppingList(updatedShoppingList);
+    localStorage.setItem("shoppingList", JSON.stringify(updatedShoppingList));
+
+    // Update shopping list count in the NavBar
+    setShoppingListCount(updatedShoppingList.length);
+  };
 
   const fetchRecipes = useCallback(async (query) => {
     setLoading(true);
@@ -59,20 +79,6 @@ const Home = () => {
     return () => clearTimeout(debounceTimeout);
   }, [searchQuery, fetchRecipes]);
 
-  const handleAddToShoppingList = (recipe) => {
-    const item = {
-      id: recipe.idMeal,
-      name: recipe.strMeal,
-      ingredients: [
-        recipe.strIngredient1,
-        recipe.strIngredient2,
-        recipe.strIngredient3,
-        // Add more if needed
-      ].filter(Boolean)
-    };
-    addToShoppingList(item);
-  };
-
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold text-center mb-4">🍽️ Welcome to Your Recipe Hub!</h1>
@@ -84,20 +90,13 @@ const Home = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
           {recipes.map((recipe) => (
-            <div key={recipe.idMeal}>
+            <div key={recipe.idMeal} className="relative">
               <RecipeCard recipe={recipe} />
-              <button
-                className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
-                onClick={() => handleAddToShoppingList(recipe)}
-              >
-                Add Ingredients to Shopping List
-              </button>
+             
             </div>
           ))}
         </div>
-      )
-      }
-      
+      )}
     </div>
   );
 };
