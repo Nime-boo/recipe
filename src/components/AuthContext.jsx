@@ -4,6 +4,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [userProfile, setUserProfile] = useState(null);
+    const [rerender, setRerender] = useState(false); // Force rerender
 
     useEffect(() => {
         try {
@@ -24,6 +25,7 @@ export const AuthProvider = ({ children }) => {
             console.log("AuthContext: Login Profile:", profile);
             localStorage.setItem("userProfile", JSON.stringify(profile));
             setUserProfile(profile);
+            setRerender(!rerender); // Force rerender
             console.log("AuthContext: setUserProfile called with:", profile);
             console.log("AuthContext: Login Successful");
         } catch (error) {
@@ -42,9 +44,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ userProfile, login, logout }}>
+        <AuthContext.Provider value={{ userProfile, login, logout, rerender }}>
             {children}
         </AuthContext.Provider>
     );
 };
+
 

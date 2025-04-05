@@ -1,9 +1,26 @@
 // src/components/WelcomePage.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const WelcomePage = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true); // Wait before showing UI
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("userProfile");
+
+        if (storedUser) {
+            // User already signed up/logged in
+            navigate("/home");
+        } else {
+            // Allow UI to show for sign up or login
+            setLoading(false);
+        }
+    }, [navigate]);
+
+    if (loading) {
+        return null; // Don’t show anything while checking
+    }
 
     return (
         <div className="flex flex-col items-center justify-center h-screen">
@@ -27,3 +44,4 @@ const WelcomePage = () => {
 };
 
 export default WelcomePage;
+

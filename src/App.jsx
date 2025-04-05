@@ -1,23 +1,36 @@
-import React, { useContext } from "react";
-import AppRoutes from "./AppRoutes";
+// src/App.jsx
+import React from "react";
+import { useLocation, Routes, Route } from "react-router-dom";
+import AppRoutes from "./AppRoutes.jsx";
 import NavBar from "./components/NavBar";
-import { ThemeContext } from "./ThemeContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import HomePage from "./components/Home.jsx";
+import Footer from "./components/Footer";
+import { ShoppingListProvider } from "./components/ShoppingListContext";
 
-import Footer from "./components/Footer"; // ← assuming you'll create this
 
 const App = () => {
-  const { theme } = useContext(ThemeContext);
+    const location = useLocation();
+    const showNavBar = location.pathname !== "/";
 
-  return (
-    <div className={`${theme === "dark" ? "bg-gray-900 text-white min-h-screen" : "bg-white text-black min-h-screen"} flex flex-col`}>
-      <NavBar />
-      <main className="flex-grow">
-        <AppRoutes />
-      </main>
-      
-      <Footer /> {/* Add contact and links later */}
-    </div>
-  );
+    return (
+        <div className="flex flex-col min-h-screen"> {/* Add flex container and min-h-screen */}
+            <div className="flex-grow"> {/* Add flex-grow to main content */}
+                {showNavBar && <NavBar />}
+                <Routes>
+                    <Route path="/*" element={<AppRoutes />} />
+                    <Route path="/my-profile" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                </Routes>
+            </div>
+            <Footer />
+        </div>
+    );
+
+    <ShoppingListProvider>
+  <App />
+</ShoppingListProvider>
 };
 
 export default App;
+
+
