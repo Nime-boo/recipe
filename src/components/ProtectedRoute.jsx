@@ -3,13 +3,17 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
 const ProtectedRoute = ({ children }) => {
+    console.log("ProtectedRoute: Before Context");
     const { userProfile } = useContext(AuthContext);
+    console.log("ProtectedRoute: After Context, userProfile:", userProfile);
+
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
         console.log("ProtectedRoute: User Profile:", userProfile);
         console.log("ProtectedRoute: AuthContext:", AuthContext); // Check Context
+
         if (userProfile) {
             console.log("ProtectedRoute: User Profile exists.");
             setIsAuthenticated(true);
