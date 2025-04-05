@@ -1,4 +1,3 @@
-// src/components/SignupPage.jsx
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
@@ -13,18 +12,24 @@ const SignupPage = () => {
         const stored = localStorage.getItem("userProfile");
         const user = stored ? JSON.parse(stored) : null;
 
-        if (user && user.email.toLowerCase() === email.toLowerCase()) {
+        // Added check for user being null
+        if (user && user.email && user.email.toLowerCase() === email.toLowerCase()) {
             alert("Email already exists. Please log in.");
             navigate("/login");
             return;
         }
 
         console.log("SignupPage: Signup Email:", email);
-        const profile = { email };
+        const profile = { email, profileCompleted: false };
         console.log("SignupPage: Profile to Login:", profile);
         login(profile);
         console.log("SignupPage: Signup Complete");
+        console.log("SignupPage: localStorage after signup:", localStorage.getItem("userProfile"));
         navigate("/profile");
+    };
+
+    const handleBack = () => {
+        navigate(-1);
     };
 
     return (
@@ -43,6 +48,12 @@ const SignupPage = () => {
                     Sign Up
                 </button>
             </form>
+            <button
+                onClick={handleBack}
+                className="mt-4 w-full bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400"
+            >
+                Back
+            </button>
         </div>
     );
 };

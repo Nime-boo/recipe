@@ -1,4 +1,3 @@
-// src/components/AppRoutes.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/Home";
@@ -9,7 +8,7 @@ import LoginPage from "./components/LoginPage";
 import ProfileSetup from "./components/ProfileSetup";
 import ProfilePage from "./components/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import WelcomePage from "./components/WelcomePage"; // Import WelcomePage
+import WelcomePage from "./components/WelcomePage";
 
 const AppRoutes = () => {
     const storedProfile = localStorage.getItem("userProfile");
@@ -56,5 +55,6 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
+
 
 

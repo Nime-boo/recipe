@@ -1,4 +1,3 @@
-// src/components/LoginPage.jsx
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
@@ -24,10 +23,14 @@ const LoginPage = () => {
 
         if (user.email.toLowerCase() === email.toLowerCase()) {
             login(user);
-            navigate("/home"); // Navigate directly to /home
+            navigate("/home");
         } else {
             alert("Incorrect email. Try again.");
         }
+    };
+
+    const handleBack = () => {
+        navigate(-1);
     };
 
     return (
@@ -44,9 +47,16 @@ const LoginPage = () => {
                 />
                 <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Log In</button>
             </form>
+            <button
+                onClick={handleBack}
+                className="mt-4 w-full bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400"
+            >
+                Back
+            </button>
         </div>
     );
 };
 
 export default LoginPage;
+
 
