@@ -14,7 +14,7 @@ const ProfileSetup = () => {
         location: "",
         allergies: "",
     });
-    const [profileCreated, setProfileCreated] = useState(false); // New state to track profile creation
+    const [profileCreated, setProfileCreated] = useState(false);
 
     const handleChange = (e) => {
         setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -22,12 +22,17 @@ const ProfileSetup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const updatedProfile = { ...profile, profileCompleted: true };
+        // Get the email from local storage.
+        const stored = localStorage.getItem("userProfile");
+        const user = stored ? JSON.parse(stored) : null;
+        const email = user.email;
+
+        const updatedProfile = { ...profile, profileCompleted: true, email: email }; // added email.
         localStorage.setItem("userProfile", JSON.stringify(updatedProfile));
         console.log("ProfileSetup: localStorage after setup:", localStorage.getItem("userProfile"));
         login(updatedProfile);
         console.log("ProfileSetup: Login called");
-        setProfileCreated(true); // Set profileCreated to true
+        setProfileCreated(true);
     };
 
     const handleBack = () => {
@@ -54,7 +59,6 @@ const ProfileSetup = () => {
                 <>
                     <h2 className="text-xl font-bold mb-4">Complete Your Profile</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Input fields and dropdowns as before */}
                         <input
                             type="text"
                             name="name"
@@ -150,4 +154,6 @@ const ProfileSetup = () => {
 };
 
 export default ProfileSetup;
+
+
 

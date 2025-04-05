@@ -12,11 +12,19 @@ const LoginPage = () => {
         const stored = localStorage.getItem("userProfile");
         const user = stored ? JSON.parse(stored) : null;
 
-        // Added check for user and user.email being null
-        if (user && user.email && user.email.toLowerCase() === email.toLowerCase()) {
-            console.log("LoginPage: Login Successful");
-            login(user);
-            navigate("/my-profile");
+        console.log("LoginPage: localStorage userProfile:", localStorage.getItem("userProfile"));
+        console.log("LoginPage: Stored User:", user);
+        console.log("LoginPage: Input Email:", email);
+
+        if (user && user.email) {
+            console.log("LoginPage: Stored User Email:", user.email);
+            if (user.email.toLowerCase().trim() === email.toLowerCase().trim()) {
+                console.log("LoginPage: Login Successful");
+                login(user);
+                navigate("/my-profile");
+            } else {
+                alert("Invalid email. Please try again.");
+            }
         } else {
             alert("Invalid email. Please try again.");
         }

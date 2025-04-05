@@ -10,8 +10,10 @@ export const AuthProvider = ({ children }) => {
             const savedProfile = localStorage.getItem("userProfile");
             if (savedProfile) {
                 setUserProfile(JSON.parse(savedProfile));
+                console.log("AuthContext: User Profile Loaded:", JSON.parse(savedProfile));
+            } else {
+                console.log("AuthContext: User Profile Loaded: null");
             }
-            console.log("AuthContext: User Profile Loaded:", JSON.parse(savedProfile));
         } catch (error) {
             console.error("AuthContext: Error loading user profile:", error);
         }

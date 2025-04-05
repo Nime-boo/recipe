@@ -1,17 +1,38 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
 const ProtectedRoute = ({ children }) => {
     const { userProfile } = useContext(AuthContext);
-    console.log("ProtectedRoute: User Profile:", userProfile);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    if (!userProfile) {
-        console.log("ProtectedRoute: User Profile is null, redirecting to /login");
+    useEffect(() => {
+        console.log("ProtectedRoute: User Profile:", userProfile);
+        console.log("ProtectedRoute: AuthContext:", AuthContext); // Check Context
+        if (userProfile) {
+            console.log("ProtectedRoute: User Profile exists.");
+            setIsAuthenticated(true);
+        } else {
+            console.log("ProtectedRoute: User Profile does not exist.");
+            setIsAuthenticated(false);
+        }
+
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 100);
+    }, [userProfile]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!isAuthenticated) {
+        console.log("ProtectedRoute: Not Authenticated, Redirecting to Login");
         return <Navigate to="/login" />;
     }
 
-    console.log("ProtectedRoute: User Profile exists, rendering children");
+    console.log("ProtectedRoute: Authenticated, Rendering Children");
     return children;
 };
 
