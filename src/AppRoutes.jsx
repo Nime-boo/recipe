@@ -1,5 +1,6 @@
+// src/AppRoutes.jsx
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import RecipeDetails from "./components/RecipeDetails";
 import Favorites from "./components/Favorites";
@@ -10,15 +11,21 @@ import ProfilePage from "./components/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const AppRoutes = () => {
+  const storedProfile = localStorage.getItem("userProfile");
+
   return (
     <Routes>
+      <Route
+        path="/"
+        element={!storedProfile ? <Navigate to="/signup" replace /> : <Navigate to="/home" replace />}
+      />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/profile" element={<ProfileSetup />} />
       <Route path="/my-profile" element={<ProfilePage />} />
 
       <Route
-        path="/"
+        path="/home"
         element={
           <ProtectedRoute>
             <Home />
