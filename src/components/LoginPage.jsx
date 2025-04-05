@@ -1,3 +1,4 @@
+// src/components/LoginPage.jsx
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
@@ -23,21 +24,15 @@ const LoginPage = () => {
 
         if (user.email.toLowerCase() === email.toLowerCase()) {
             login(user);
-
-            // Check if profile is complete (adjust condition as needed)
-            if (user.profileCompleted) { // Replace with your completion check
-                navigate("/home");
-            } else {
-                navigate("/profile");
-            }
+            navigate("/home"); // Navigate directly to /home
         } else {
             alert("Incorrect email. Try again.");
         }
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 mt-10 bg-white rounded shadow">
-            <h2 className="text-2xl font-bold text-center mb-4">Log In</h2>
+        <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
+            <h2 className="text-xl font-bold mb-4">Log In</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     type="email"
