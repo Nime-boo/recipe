@@ -9,19 +9,13 @@ const ShoppingList = () => {
   return (
     <div
       className={`mt-8 p-4 border rounded-lg shadow-md transition-all duration-300 
-        ${
-          theme === "dark"
-            ? "bg-gray-900 text-white border-gray-700"
-            : "bg-gray-100 text-black border-gray-300"
-        }`}
+        ${theme === "dark" ? "bg-gray-900 text-white border-gray-700" : "bg-gray-100 text-black border-gray-300"}`}
     >
       <h2 className="text-xl font-bold mb-2">🛒 Shopping List</h2>
 
       {shoppingList.length === 0 ? (
         <p
-          className={`transition-all duration-300 ${
-            theme === "dark" ? "text-gray-400" : "text-gray-600"
-          }`}
+          className={`transition-all duration-300 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
         >
           No ingredients added yet.
         </p>
@@ -40,11 +34,7 @@ const ShoppingList = () => {
                 min="1"
                 onChange={(e) => updateQuantity(index, e.target.value)}
                 className={`border p-1 w-16 text-center transition-all duration-300 
-                  ${
-                    theme === "dark"
-                      ? "bg-gray-800 text-white border-gray-600"
-                      : "bg-white text-black border-gray-300"
-                  }`}
+                  ${theme === "dark" ? "bg-gray-800 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
               />
               <button
                 onClick={() => removeItem(index)}

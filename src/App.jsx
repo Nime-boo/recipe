@@ -6,29 +6,26 @@ import NavBar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./components/Home.jsx";
 import Footer from "./components/Footer";
-import { ShoppingListProvider } from "./components/ShoppingListContext";
-
+import { ShoppingListProvider } from "./components/ShoppingListContext"; // ✅ Import ShoppingListProvider
 
 const App = () => {
-    const location = useLocation();
-    const showNavBar = location.pathname !== "/";
+  const location = useLocation();
+  const showNavBar = location.pathname !== "/";
 
-    return (
-        <div className="flex flex-col min-h-screen"> {/* Add flex container and min-h-screen */}
-            <div className="flex-grow"> {/* Add flex-grow to main content */}
-                {showNavBar && <NavBar />}
-                <Routes>
-                    <Route path="/*" element={<AppRoutes />} />
-                    <Route path="/my-profile" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-                </Routes>
-            </div>
-            <Footer />
+  return (
+    <ShoppingListProvider> {/* ✅ Wrap the entire component tree with ShoppingListProvider */}
+      <div className="flex flex-col min-h-screen"> {/* Add flex container and min-h-screen */}
+        <div className="flex-grow"> {/* Add flex-grow to main content */}
+          {showNavBar && <NavBar />}
+          <Routes>
+            <Route path="/*" element={<AppRoutes />} />
+            <Route path="/my-profile" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+          </Routes>
         </div>
-    );
-
-    <ShoppingListProvider>
-  <App />
-</ShoppingListProvider>
+        <Footer />
+      </div>
+    </ShoppingListProvider>
+  );
 };
 
 export default App;
