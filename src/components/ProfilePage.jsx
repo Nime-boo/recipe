@@ -2,12 +2,13 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "./AuthContext";
 
 const ProfilePage = () => {
-  const { user, logout, updateUser } = useContext(AuthContext);
+  const { userProfile, logout, updateUser } = useContext(AuthContext);
+    console.log("UserProfile", userProfile)
   const [isEditing, setIsEditing] = useState(false);
-  const [newName, setNewName] = useState(user ? user.name : "");
-  const [newPreference, setNewPreference] = useState(user ? user.preference : "");
+  const [newName, setNewName] = useState(userProfile ? userProfile.name : "");
+  const [newPreference, setNewPreference] = useState(userProfile ? userProfile.preference : "");
 
-  if (!user) return <p className="text-center mt-10">Not logged in.</p>;
+  if (!userProfile) return <p className="text-center mt-10">Not logged in.</p>;
 
   const handleEditProfile = () => {
     setIsEditing(true);
@@ -52,9 +53,9 @@ const ProfilePage = () => {
         </div>
       ) : (
         <div>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          {user.preference && <p><strong>Diet:</strong> {user.preference}</p>}
+          <p><strong>Name:</strong> {userProfile.name}</p>
+          <p><strong>Email:</strong> {userProfile.email}</p>
+          {userProfile.preference && <p><strong>Diet:</strong> {userProfile.preference}</p>}
           <button
             onClick={handleEditProfile}
             className="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"

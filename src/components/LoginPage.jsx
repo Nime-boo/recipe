@@ -4,34 +4,27 @@ import { AuthContext } from "./AuthContext";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
-    const { login } = useContext(AuthContext);
+    const { login } = useContext(AuthContext); // Use login function from AuthContext
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const stored = localStorage.getItem("userProfile");
-        const user = stored ? JSON.parse(stored) : null;
 
-        console.log("LoginPage: localStorage userProfile:", localStorage.getItem("userProfile"));
-        console.log("LoginPage: Stored User:", user);
-        console.log("LoginPage: Input Email:", email);
-
-        if (user && user.email) {
-            console.log("LoginPage: Stored User Email:", user.email);
-            if (user.email.toLowerCase().trim() === email.toLowerCase().trim()) {
-                console.log("LoginPage: Login Successful");
-                login(user);
-                navigate("/my-profile");
-            } else {
-                alert("Invalid email. Please try again.");
-            }
-        } else {
-            alert("Invalid email. Please try again.");
+        const trimmedEmail = email.toLowerCase().trim();
+        if (!trimmedEmail) {
+            alert("Please enter a valid email address.");
+            return;
         }
-    };
 
-    const handleBack = () => {
-        navigate(-1);
+        // Example user object, replace this logic with real authentication
+        const user = {
+            email: trimmedEmail,
+            name: trimmedEmail.split("@")[0], // Just a sample name from email
+        };
+
+        console.log("LoginPage: Logging in user:", user);
+        login(user); // Call login function from context
+        navigate("/home"); // Redirect after login
     };
 
     return (
@@ -46,21 +39,15 @@ const LoginPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                <button
+                    type="submit"
+                    className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                >
                     Log In
                 </button>
             </form>
-            <button
-                onClick={handleBack}
-                className="mt-4 w-full bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400"
-            >
-                Back
-            </button>
         </div>
     );
 };
 
 export default LoginPage;
-
-
-

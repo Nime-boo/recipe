@@ -24,17 +24,17 @@ const NavBar = () => {
       <div className="container mx-auto flex justify-between items-center">
         {/* Navigation Links */}
         <div className="flex space-x-6 text-lg font-semibold">
-          <NavLink to="/" className="hover:underline" activeClassName="text-yellow-500">
+          <NavLink to="/" className="hover:underline" activeclassname="text-yellow-500">
             Home
           </NavLink>
-          <NavLink to="/favorites" className="hover:underline" activeClassName="text-yellow-500">
+          <NavLink to="/favorites" className="hover:underline" activeclassname="text-yellow-500">
             Favorites
           </NavLink>
-          <NavLink to="/shopping-list" className="hover:underline" activeClassName="text-yellow-500">
+          <NavLink to="/shopping-list" className="hover:underline" activeclassname="text-yellow-500">
             🛒 Shopping List ({shoppingListCount})
           </NavLink>
           {/* Add Profile link */}
-          <NavLink to="/my-profile" className="hover:underline" activeClassName="text-yellow-500">
+          <NavLink to="/my-profile" className="hover:underline" activeclassname="text-yellow-500">
             👤 Profile
           </NavLink>
         </div>

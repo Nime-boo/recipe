@@ -4,50 +4,51 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [userProfile, setUserProfile] = useState(null);
-    const [rerender, setRerender] = useState(false); // Force rerender
 
+    // Load profile from localStorage on first render
     useEffect(() => {
-        try {
-            const savedProfile = localStorage.getItem("userProfile");
-            if (savedProfile) {
-                setUserProfile(JSON.parse(savedProfile));
-                console.log("AuthContext: User Profile Loaded:", JSON.parse(savedProfile));
-            } else {
-                console.log("AuthContext: User Profile Loaded: null");
+        const savedProfile = localStorage.getItem("userProfile");
+        if (savedProfile) {
+            try {
+                const parsedProfile = JSON.parse(savedProfile);
+                setUserProfile(parsedProfile);  // Set the user profile in the context state
+                console.log("AuthContext: User Profile Loaded:", parsedProfile);
+            } catch (error) {
+                console.error("AuthContext: Failed to parse saved userProfile", error);
             }
-        } catch (error) {
-            console.error("AuthContext: Error loading user profile:", error);
+        } else {
+            console.log("AuthContext: No user profile found.");
         }
     }, []);
 
+    // Login function: save to context and localStorage
     const login = (profile) => {
         try {
-            console.log("AuthContext: Login Profile:", profile);
-            localStorage.setItem("userProfile", JSON.stringify(profile));
-            setUserProfile(profile);
-            setRerender(!rerender); // Force rerender
-            console.log("AuthContext: setUserProfile called with:", profile);
-            console.log("AuthContext: Login Successful");
+            setUserProfile(profile); // Update context state
+            localStorage.setItem("userProfile", JSON.stringify(profile)); // Save profile to localStorage
+            console.log("AuthContext: User logged in:", profile);
         } catch (error) {
-            console.error("AuthContext: Error in login:", error);
+            console.error("AuthContext: Login Error:", error);
         }
     };
 
+    // Logout function: remove from context and localStorage
     const logout = () => {
         try {
-            localStorage.removeItem("userProfile");
-            setUserProfile(null);
-            console.log("AuthContext: Logout Successful");
+            localStorage.removeItem("userProfile");  // Remove profile from localStorage
+            setUserProfile(null);  // Clear the user profile from context
+            console.log("AuthContext: User logged out");
         } catch (error) {
-            console.error("AuthContext: Error removing user profile:", error);
+            console.error("AuthContext: Logout Error:", error);
         }
     };
 
     return (
-        <AuthContext.Provider value={{ userProfile, login, logout, rerender }}>
+        <AuthContext.Provider value={{ userProfile, setUserProfile, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 };
+
 
 

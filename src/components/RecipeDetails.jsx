@@ -1,80 +1,136 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const RecipeCard = ({ recipe }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+const RecipeDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // ✅ Redirect to profile setup if not set
+  useEffect(() => {
+    const userProfile = localStorage.getItem("userProfile");
+    if (!userProfile) {
+      navigate("/profile");
+    }
+  }, [navigate]);
+
+  const fetchRecipeDetails = async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+
+      const response = await axios.get(
+        `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipe.idMeal}`
+      );
+      if (response.data.meals) {
+        setRecipe(response.data.meals[0]);
+        console.log(response.data.meals)
+      } else {
+        setError("Recipe not found.");
+      }
+    } catch (err) {
+      setError("Failed to fetch recipe details. Please try again.");
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setIsFavorite(savedFavorites.some((fav) => fav.idMeal === recipe.idMeal));
-  }, [recipe.idMeal]);
+    fetchRecipeDetails();
+  }, [id]);
 
-  const toggleFavorite = () => {
-    let savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    if (isFavorite) {
-      savedFavorites = savedFavorites.filter((fav) => fav.idMeal !== recipe.idMeal);
-    } else {
-      savedFavorites.push(recipe);
-    }
-    localStorage.setItem("favorites", JSON.stringify(savedFavorites));
-    setIsFavorite(!isFavorite);
-  };
-
-  const addToShoppingList = () => {
-    const ingredients = [];
+  const getIngredients = (recipe) => {
+    let ingredients = [];
     for (let i = 1; i <= 20; i++) {
-      if (recipe[`strIngredient${i}`]) {
-        ingredients.push({
-          name: recipe[`strIngredient${i}`],
-          measure: recipe[`strMeasure${i}`] || "",
-        });
+      const ingredient = recipe[`strIngredient${i}`];
+      const measure = recipe[`strMeasure${i}`];
+      if (ingredient && ingredient.trim()) {
+        ingredients.push(`${measure} ${ingredient}`);
       }
     }
-
-    let savedShoppingList = JSON.parse(localStorage.getItem("shoppingList")) || [];
-
-    // Prevent duplicates before adding
-    const updatedList = [...savedShoppingList, ...ingredients].reduce((acc, item) => {
-      if (!acc.find((ing) => ing.name === item.name)) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
-
-    localStorage.setItem("shoppingList", JSON.stringify(updatedList));
-    alert("Ingredients added to shopping list!");
+    return ingredients;
   };
+
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="text-center text-red-500">
+        <p>{error}</p>
+        <button
+          onClick={fetchRecipeDetails(id)}
+          className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
+
+  const ingredients = getIngredients(recipe);
+  const videoEmbedUrl = getYouTubeEmbedUrl(recipe.strYoutube);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 transition-transform transform hover:scale-105 hover:shadow-lg">
-      <Link to={`/recipe/${recipe.idMeal}`} className="block">
+    <div className="container mx-auto p-6">
+      <Link to="/" className="text-blue-500 hover:underline">
+        ← Back to Home
+      </Link>
+
+      <h1 className="text-3xl font-bold text-center mt-4">{recipe.strMeal}</h1>
+      <p className="text-center text-gray-600">
+        {recipe.strCategory} | {recipe.strArea}
+      </p>
+
+      <div className="flex flex-col md:flex-row items-center gap-6 mt-6">
         <img
           src={recipe.strMealThumb}
           alt={recipe.strMeal}
-          className="w-full h-48 object-cover rounded-md"
+          className="w-full md:w-1/2 rounded-lg shadow-md"
         />
-        <h2 className="text-xl font-semibold mt-2">{recipe.strMeal}</h2>
-        <p className="text-gray-600 font-medium">{recipe.strCategory} | {recipe.strArea}</p>
-      </Link>
-      <div className="flex justify-between items-center mt-3">
-        {/* Keep only one button */}
-        <button
-          onClick={addToShoppingList}
-          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-        >
-          🛒 Add ingredients to shopping list
-        </button>
-        <button
-          onClick={toggleFavorite}
-          className={`px-3 py-2 rounded-md ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-300 text-black'}`}
-        >
-          {isFavorite ? "❤️ Remove" : "♡ Favorite"}
-        </button>
+        <div className="w-full md:w-1/2">
+          <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
+          <ul className="list-disc pl-5 space-y-1 text-gray-700">
+            {ingredients.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
       </div>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-2">Instructions</h2>
+        <p className="whitespace-pre-line text-gray-700">{recipe.strInstructions}</p>
+      </div>
+
+      {videoEmbedUrl && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-2">Watch Video</h2>
+          <div className="aspect-w-16 aspect-h-9">
+            <iframe
+              src={videoEmbedUrl}
+              title="YouTube video player"
+              className="w-full h-72 md:h-96 rounded-lg shadow-lg"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default RecipeCard;
-
-
+export default RecipeDetails;

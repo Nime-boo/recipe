@@ -29,7 +29,7 @@ const AppRoutes = () => {
                 }
             />
             <Route
-                path="/recipe/:id"
+                path="/recipe/id"
                 element={
                     <ProtectedRoute>
                         <RecipeDetails />

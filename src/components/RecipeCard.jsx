@@ -47,7 +47,7 @@ const RecipeCard = ({ recipe }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 transition-transform transform hover:scale-105 hover:shadow-lg">
-      <Link to={`/recipe/${recipe.idMeal}`} className="block">
+      <Link to={`/recipe/${recipe.idMeal}`} className="block" onClick={console.log(recipe.idMeal)}>
         <img
           src={recipe.strMealThumb}
           alt={recipe.strMeal}

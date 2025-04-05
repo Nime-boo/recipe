@@ -5,6 +5,7 @@ import axios from "axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
+
 const Home = ({ setShoppingListCount }) => {
   const [recipes, setRecipes] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -92,6 +93,7 @@ const Home = ({ setShoppingListCount }) => {
           {recipes.map((recipe) => (
             <div key={recipe.idMeal} className="relative">
               <RecipeCard recipe={recipe} />
+             
              
             </div>
           ))}

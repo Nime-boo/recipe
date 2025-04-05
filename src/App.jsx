@@ -1,10 +1,10 @@
-// src/App.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./components/AuthContext"; // Import AuthContext
 import AppRoutes from "./AppRoutes.jsx";
 import NavBar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import HomePage from "./components/Home.jsx";
+import ProfilePage from "./components/ProfilePage"; // Import ProfilePage component
 import Footer from "./components/Footer";
 import ShoppingList from "./components/ShoppingList"; // Import ShoppingList component
 
@@ -39,24 +39,31 @@ const App = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex-grow">
-        {showNavBar && <NavBar shoppingListCount={shoppingListCount} />}
-        <Routes>
-          <Route path="/*" element={<AppRoutes addToShoppingList={addToShoppingList} />} />
-          <Route
-            path="/my-profile"
-            element={<ProtectedRoute><HomePage /></ProtectedRoute>}
-          />
-          {/* Add route for shopping list */}
-          <Route
-            path="/shopping-list"
-            element={<ShoppingList shoppingList={shoppingList} />}
-          />
-        </Routes>
+    <AuthProvider>
+      <div className="flex flex-col min-h-screen">
+        <div className="flex-grow">
+          {showNavBar && <NavBar shoppingListCount={shoppingListCount} />}
+          <Routes>
+            <Route path="/*" element={<AppRoutes addToShoppingList={addToShoppingList} />} />
+            {/* ProfilePage is wrapped with ProtectedRoute to ensure authentication */}
+            <Route
+              path="/my-profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            {/* Route for shopping list */}
+            <Route
+              path="/shopping-list"
+              element={<ShoppingList shoppingList={shoppingList} />}
+            />
+          </Routes>
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </AuthProvider>
   );
 };
 
