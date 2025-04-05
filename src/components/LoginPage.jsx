@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
@@ -10,22 +10,15 @@ const LoginPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const stored = localStorage.getItem("userProfile");
-        console.log("LoginPage: Stored Profile:", stored);
+        const user = stored ? JSON.parse(stored) : null;
 
-        if (!stored) {
-            alert("No user found. Please sign up first.");
-            return;
-        }
-
-        const user = JSON.parse(stored);
-        console.log("LoginPage: Parsed User:", user);
-        console.log("LoginPage: Entered Email:", email);
-
-        if (user.email.toLowerCase() === email.toLowerCase()) {
+        // Added check for user and user.email being null
+        if (user && user.email && user.email.toLowerCase() === email.toLowerCase()) {
+            console.log("LoginPage: Login Successful");
             login(user);
-            navigate("/home");
+            navigate("/my-profile");
         } else {
-            alert("Incorrect email. Try again.");
+            alert("Invalid email. Please try again.");
         }
     };
 
@@ -45,7 +38,9 @@ const LoginPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Log In</button>
+                <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                    Log In
+                </button>
             </form>
             <button
                 onClick={handleBack}
@@ -58,5 +53,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
 
 

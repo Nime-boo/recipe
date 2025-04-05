@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import RecipeDetails from "./components/RecipeDetails";
 import Favorites from "./components/Favorites";
@@ -11,13 +11,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import WelcomePage from "./components/WelcomePage";
 
 const AppRoutes = () => {
-    const storedProfile = localStorage.getItem("userProfile");
-    const user = storedProfile ? JSON.parse(storedProfile) : null;
-    const profileCompleted = user && user.profileCompleted;
-
-    console.log("AppRoutes: Stored Profile:", storedProfile);
-    console.log("AppRoutes: Profile Completed:", profileCompleted);
-
     return (
         <Routes>
             <Route path="/" element={<WelcomePage />} />

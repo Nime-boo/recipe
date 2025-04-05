@@ -22,9 +22,10 @@ export const AuthProvider = ({ children }) => {
             console.log("AuthContext: Login Profile:", profile);
             localStorage.setItem("userProfile", JSON.stringify(profile));
             setUserProfile(profile);
+            console.log("AuthContext: setUserProfile called with:", profile);
             console.log("AuthContext: Login Successful");
         } catch (error) {
-            console.error("AuthContext: Error saving user profile:", error);
+            console.error("AuthContext: Error in login:", error);
         }
     };
 
