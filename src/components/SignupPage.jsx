@@ -14,7 +14,7 @@ const SignupPage = () => {
         console.log("SignupPage: Profile to Login:", profile);
         login(profile);
         console.log("SignupPage: Signup Complete");
-        navigate("/login");
+        navigate("/profile"); // Navigate to /profile after signup
     };
 
     return (
@@ -38,3 +38,4 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
+

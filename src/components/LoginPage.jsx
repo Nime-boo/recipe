@@ -23,7 +23,13 @@ const LoginPage = () => {
 
         if (user.email.toLowerCase() === email.toLowerCase()) {
             login(user);
-            navigate("/home");
+
+            // Check if profile is complete (adjust condition as needed)
+            if (user.profileCompleted) { // Replace with your completion check
+                navigate("/home");
+            } else {
+                navigate("/profile");
+            }
         } else {
             alert("Incorrect email. Try again.");
         }
