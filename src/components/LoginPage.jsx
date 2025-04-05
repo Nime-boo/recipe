@@ -10,6 +10,7 @@ const LoginPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const stored = localStorage.getItem("userProfile");
+        console.log("LoginPage: Stored Profile:", stored);
 
         if (!stored) {
             alert("No user found. Please sign up first.");
@@ -17,6 +18,9 @@ const LoginPage = () => {
         }
 
         const user = JSON.parse(stored);
+        console.log("LoginPage: Parsed User:", user);
+        console.log("LoginPage: Entered Email:", email);
+
         if (user.email.toLowerCase() === email.toLowerCase()) {
             login(user);
             navigate("/home");
