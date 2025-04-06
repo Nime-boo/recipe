@@ -12,7 +12,9 @@ const RecipeCard = ({ recipe }) => {
   const toggleFavorite = () => {
     let savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
     if (isFavorite) {
-      savedFavorites = savedFavorites.filter((fav) => fav.idMeal !== recipe.idMeal);
+      savedFavorites = savedFavorites.filter(
+        (fav) => fav.idMeal !== recipe.idMeal
+      );
     } else {
       savedFavorites.push(recipe);
     }
@@ -31,17 +33,25 @@ const RecipeCard = ({ recipe }) => {
       }
     }
 
-    let savedShoppingList = JSON.parse(localStorage.getItem("shoppingList")) || [];
+    let savedShoppingList =
+      JSON.parse(localStorage.getItem("shoppingList")) || [];
 
-    // Prevent duplicates before adding
-    const updatedList = [...savedShoppingList, ...ingredients].reduce((acc, item) => {
-      if (!acc.find((ing) => ing.name === item.name)) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
+    const updatedList = [...savedShoppingList, ...ingredients].reduce(
+      (acc, item) => {
+        if (!acc.find((ing) => ing.name === item.name)) {
+          acc.push(item);
+        }
+        return acc;
+      },
+      []
+    );
 
+    // Update localStorage
     localStorage.setItem("shoppingList", JSON.stringify(updatedList));
+
+    // Dispatch event immediately to update NavBar count
+    window.dispatchEvent(new Event("shoppingListUpdated"));
+
     alert("Ingredients added to shopping list!");
   };
 
@@ -54,18 +64,22 @@ const RecipeCard = ({ recipe }) => {
           className="w-full h-48 object-cover rounded-md"
         />
         <h2 className="text-xl font-semibold mt-2">{recipe.strMeal}</h2>
-        <p className="text-gray-600 font-medium">{recipe.strCategory} | {recipe.strArea}</p>
+        <p className="text-gray-600 font-medium">
+          {recipe.strCategory} | {recipe.strArea}
+        </p>
       </Link>
       <div className="flex justify-between items-center mt-3">
-        <button 
-          onClick={addToShoppingList} 
+        <button
+          onClick={addToShoppingList}
           className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
         >
           🛒 Add to Shopping List
         </button>
-        <button 
-          onClick={toggleFavorite} 
-          className={`px-3 py-2 rounded-md ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-300 text-black'}`}
+        <button
+          onClick={toggleFavorite}
+          className={`px-3 py-2 rounded-md ${
+            isFavorite ? "bg-red-500 text-white" : "bg-gray-300 text-black"
+          }`}
         >
           {isFavorite ? "❤️ Remove" : "♡ Favorite"}
         </button>
@@ -75,5 +89,4 @@ const RecipeCard = ({ recipe }) => {
 };
 
 export default RecipeCard;
-
 

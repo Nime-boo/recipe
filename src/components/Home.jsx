@@ -18,7 +18,15 @@ const Home = () => {
     try {
       const cacheKey = `recipes-${query}`;
       const cachedData = localStorage.getItem(cacheKey);
-      if (cachedData) {
+      const cachedTime = localStorage.getItem(`${cacheKey}-timestamp`);
+      const now = Date.now();
+      const cacheExpiry = 5 * 60 * 1000; // 5 minutes
+
+      if (
+        cachedData &&
+        cachedTime &&
+        now - parseInt(cachedTime) < cacheExpiry
+      ) {
         setRecipes(JSON.parse(cachedData));
       } else {
         const response = await axios.get(
@@ -27,6 +35,7 @@ const Home = () => {
         const meals = response.data.meals || [];
         setRecipes(meals);
         localStorage.setItem(cacheKey, JSON.stringify(meals));
+        localStorage.setItem(`${cacheKey}-timestamp`, now.toString());
       }
     } catch (error) {
       console.error("Error fetching recipes:", error);
@@ -67,6 +76,7 @@ const Home = () => {
       <SearchBar
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
+        onSearch={(query) => setSearchQuery(query)} // Add this prop
       />
       {loading ? (
         <Skeleton count={5} height={200} />
