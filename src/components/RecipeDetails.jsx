@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -17,29 +17,28 @@ const RecipeDetails = () => {
     }
   }, [navigate]);
 
-  const fetchRecipeDetails = async (id) => {
+  const fetchRecipeDetails = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-
       const response = await axios.get(
-        `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipe.idMeal}`
+        `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}` // Changed from recipe.idMeal to id
       );
       if (response.data.meals) {
         setRecipe(response.data.meals[0]);
-        console.log(response.data.meals)
+        console.log(response.data.meals);
       } else {
         setError("Recipe not found.");
       }
     } catch (err) {
-      setError("Failed to fetch recipe details. Please try again.");
+      setError(err);
     }
     setLoading(false);
-  };
+  }, [id]); // Only depend on the URL parameter
 
   useEffect(() => {
     fetchRecipeDetails();
-  }, [id]);
+  }, [fetchRecipeDetails]);
 
   const getIngredients = (recipe) => {
     let ingredients = [];
@@ -55,7 +54,9 @@ const RecipeDetails = () => {
 
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+    const match = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/
+    );
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
@@ -111,7 +112,9 @@ const RecipeDetails = () => {
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-2">Instructions</h2>
-        <p className="whitespace-pre-line text-gray-700">{recipe.strInstructions}</p>
+        <p className="whitespace-pre-line text-gray-700">
+          {recipe.strInstructions}
+        </p>
       </div>
 
       {videoEmbedUrl && (

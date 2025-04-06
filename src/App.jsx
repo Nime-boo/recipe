@@ -6,7 +6,8 @@ import NavBar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./components/ProfilePage"; // Import ProfilePage component
 import Footer from "./components/Footer";
-import ShoppingList from "./components/ShoppingList"; // Import ShoppingList component
+import ShoppingList from "./components/ShoppingList";
+import { ShopProvider } from "./components/ShopContext.jsx"; // Import ShoppingList component
 
 const App = () => {
   const location = useLocation();
@@ -42,9 +43,16 @@ const App = () => {
     <AuthProvider>
       <div className="flex flex-col min-h-screen">
         <div className="flex-grow">
-          {showNavBar && <NavBar shoppingListCount={shoppingListCount} />}
+          {showNavBar && (
+            <ShopProvider>
+              <NavBar shoppingListCount={shoppingListCount} />
+            </ShopProvider>
+          )}
           <Routes>
-            <Route path="/*" element={<AppRoutes addToShoppingList={addToShoppingList} />} />
+            <Route
+              path="/*"
+              element={<AppRoutes addToShoppingList={addToShoppingList} />}
+            />
             {/* ProfilePage is wrapped with ProtectedRoute to ensure authentication */}
             <Route
               path="/my-profile"
@@ -57,7 +65,11 @@ const App = () => {
             {/* Route for shopping list */}
             <Route
               path="/shopping-list"
-              element={<ShoppingList shoppingList={shoppingList} />}
+              element={
+                <ShopProvider>
+                  <ShoppingList shoppingList={shoppingList} />
+                </ShopProvider>
+              }
             />
           </Routes>
         </div>
@@ -68,6 +80,3 @@ const App = () => {
 };
 
 export default App;
-
-
-

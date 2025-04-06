@@ -5,37 +5,12 @@ import axios from "axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-
-const Home = ({ setShoppingListCount }) => {
+const Home = () => {
   const [recipes, setRecipes] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [shoppingList, setShoppingList] = useState(
-    JSON.parse(localStorage.getItem("shoppingList")) || []
-  );
-
-  // Function to add ingredients to shopping list
-  const handleAddToShoppingList = (recipe) => {
-    const item = {
-      id: recipe.idMeal,
-      name: recipe.strMeal,
-      ingredients: [
-        recipe.strIngredient1,
-        recipe.strIngredient2,
-        recipe.strIngredient3,
-        // Add more if needed
-      ].filter(Boolean),
-    };
-
-    const updatedShoppingList = [...shoppingList, ...item.ingredients];
-    setShoppingList(updatedShoppingList);
-    localStorage.setItem("shoppingList", JSON.stringify(updatedShoppingList));
-
-    // Update shopping list count in the NavBar
-    setShoppingListCount(updatedShoppingList.length);
-  };
 
   const fetchRecipes = useCallback(async (query) => {
     setLoading(true);
@@ -55,7 +30,9 @@ const Home = ({ setShoppingListCount }) => {
       }
     } catch (error) {
       console.error("Error fetching recipes:", error);
-      setError("Failed to load recipes. Please check your internet connection.");
+      setError(
+        "Failed to load recipes. Please check your internet connection."
+      );
     }
     setLoading(false);
   }, []);
@@ -63,7 +40,9 @@ const Home = ({ setShoppingListCount }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("https://www.themealdb.com/api/json/v1/1/categories.php");
+        const response = await axios.get(
+          "https://www.themealdb.com/api/json/v1/1/categories.php"
+        );
         setCategories(response.data.categories || []);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -82,8 +61,13 @@ const Home = ({ setShoppingListCount }) => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-4">🍽️ Welcome to Your Recipe Hub!</h1>
-      <SearchBar value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+      <h1 className="text-3xl font-bold text-center mb-4">
+        🍽️ Welcome to Your Recipe Hub!
+      </h1>
+      <SearchBar
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
       {loading ? (
         <Skeleton count={5} height={200} />
       ) : error ? (
@@ -93,8 +77,6 @@ const Home = ({ setShoppingListCount }) => {
           {recipes.map((recipe) => (
             <div key={recipe.idMeal} className="relative">
               <RecipeCard recipe={recipe} />
-             
-             
             </div>
           ))}
         </div>

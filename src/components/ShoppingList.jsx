@@ -1,27 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from "react";
+import { useShop } from "../hooks/useShopList";
 
 const ShoppingList = () => {
-  const [shoppingList, setShoppingList] = useState([]);
+  const { shoppingList, setShoppingList, setShoppingListCount } = useShop();
 
   useEffect(() => {
     // Load shopping list from localStorage on component mount
-    const savedShoppingList = JSON.parse(localStorage.getItem("shoppingList")) || [];
+    const savedShoppingList =
+      JSON.parse(localStorage.getItem("shoppingList")) || [];
     setShoppingList(savedShoppingList);
-  }, []);
+  }, [setShoppingList]);
 
-  // Update item quantity
+  useEffect(() => {
+    setShoppingListCount(shoppingList.length);
+  }, [shoppingList, setShoppingListCount]);
+
   const updateQuantity = (index, quantity) => {
     const updatedList = [...shoppingList];
     updatedList[index].quantity = quantity;
     setShoppingList(updatedList);
-    localStorage.setItem("shoppingList", JSON.stringify(updatedList)); // Save to localStorage
   };
 
-  // Remove item from shopping list
   const removeItem = (index) => {
     const updatedList = shoppingList.filter((_, i) => i !== index);
+
+    // Update all states and storage synchronously
     setShoppingList(updatedList);
-    localStorage.setItem("shoppingList", JSON.stringify(updatedList)); // Save to localStorage
+    setShoppingListCount(updatedList.length);
+    localStorage.setItem("shoppingList", JSON.stringify(updatedList));
+
+    // Dispatch custom event immediately after state updates
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new Event("shoppingListUpdated"));
+    });
   };
 
   return (
@@ -32,11 +43,16 @@ const ShoppingList = () => {
       ) : (
         <ul className="space-y-4">
           {shoppingList.map((item, index) => (
-            <li key={index} className="flex justify-between items-center py-2 border-b">
-              <span>{item.name} {item.measure && `(${item.measure})`}</span>
+            <li
+              key={index}
+              className="flex justify-between items-center py-2 border-b"
+            >
+              <span>
+                {item.name} {item.measure && `(${item.measure})`}
+              </span>
               <input
                 type="number"
-                value={item.quantity || ''}
+                value={item.quantity || ""}
                 onChange={(e) => updateQuantity(index, e.target.value)}
                 className="border p-1 w-16 text-center"
                 placeholder="Qty"
